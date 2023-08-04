@@ -100,18 +100,18 @@ export default function Home() {
         theme="dark"
       />
       <div className="mt-3">
-        <h1 className="text-[1.8rem] text-center">Your ToDo List &#128071;</h1>
+        <h1 className="text-[1.56rem] md:text-[1.8rem] text-center">Your ToDo List &#128071;</h1>
       </div>
 
       <div className="flex justify-center mt-10 flex-col items-center">
-        <div className="border rounded-[10px] p-[10px] w-[60vw] h-[75vh]">
+        <div className="border rounded-[10px] p-[10px] w-[90vw] md:w-[60vw] h-[75vh]">
           <div className="text-center">
-            <h2 className="text-[1.7rem]">Your tasks</h2>
+            <h2 className="text-[1.5rem] md:text-[1.7rem]">Your tasks</h2>
           </div>
           {getItems?.map((item, index) => (
             <>
               <div className="flex items-center justify-between" key={item}>
-                <p className="text-xl px-1 py-3">&#10132; {item}</p>
+                <p className="text-lg md:text-xl px-1 py-3 break-all">&#10132; {item}</p>
                 <button onClick={() => handleDeletetasks(item)} ><DeleteIcon /></button>
               </div>
               <hr key={index} />
@@ -121,7 +121,7 @@ export default function Home() {
         <form action="/" onSubmit={handleSubmit}>
           <div className="mt-5 flex gap-[20px] items-center">
             <input
-              className="w-[40vw] text-black py-1 px-2 text-lg outline-none rounded font-semibold"
+              className="w-[70vw] md:w-[40vw] text-black py-1 px-2 text-base md:text-lg outline-none rounded font-semibold"
               type="text"
               name="tasks"
               value={tasks}
