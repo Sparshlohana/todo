@@ -126,7 +126,7 @@ export default function Home() {
               name="tasks"
               value={tasks}
               onChange={handleTasksOnChange}
-              placeholder="Enter your Task..."
+              placeholder="Create your Task..."
             />
             <button type="submit"><SendIcon /></button>
           </div>
