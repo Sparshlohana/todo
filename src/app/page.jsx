@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { DeleteIcon, SendIcon } from "./components/icons/Icons";
+import { DeleteIcon, EditIcon, SendIcon } from "./components/icons/Icons";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -9,6 +9,7 @@ export default function Home() {
   const [tasks, setTasks] = useState("");
   const [taskArr, setTaskArr] = useState([]);
   const [getItems, setGetItems] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
   const handleTasksOnChange = (e) => {
     setTasks(e.target.value);
@@ -26,6 +27,17 @@ export default function Home() {
   });
 
   const sucessToast = () => toast.success('Woah..! Task Added 😋', {
+    position: "top-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
+
+  const UpdateTask = () => toast.success('Task Updated Successfully..!! 😋', {
     position: "top-right",
     autoClose: 4000,
     hideProgressBar: false,
@@ -57,34 +69,41 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(taskArr));
-    const storedTasks = localStorage.getItem("tasks");
-    let parsedTasks = JSON.parse(storedTasks);
-    setGetItems(parsedTasks);
+    setGetItems(taskArr); // Directly set getItems from taskArr
   }, [taskArr]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (tasks) {
-      if (getItems.includes(tasks)) errorToast()
-      else {
-        setTaskArr([...taskArr, tasks]);
-        sucessToast();
-      };
-
+    if (tasks.trim() !== "") {
+      if (getItems.includes(tasks)) {
+        errorToast();
+      } else {
+        if (editIndex !== null) { // If editing, update the task at editIndex
+          const updatedTasks = [...getItems];
+          updatedTasks[editIndex] = tasks;
+          setTaskArr(updatedTasks);
+          setEditIndex(null); // Reset editIndex after updating
+          UpdateTask()
+        } else {
+          setTaskArr([...taskArr, tasks]);
+          sucessToast();
+        }
+      }
+      setTasks("");
     }
-    setTasks("");
   }
 
-  const handleDeletetasks = (item) => {
+  const handleEditTask = (index) => {
+    setTasks(getItems[index]);
+    setEditIndex(index);
+  }
+
+
+  const handleDeleteTask = (index) => {
     deleteToast();
-    const tasks = localStorage.getItem("tasks");
-    let parsedTasks = JSON.parse(tasks);
-    const filteredTask = parsedTasks.filter((task) => task !== item);
-    localStorage.setItem("tasks", JSON.stringify(filteredTask));
-    setGetItems(filteredTask);
-    setTaskArr(filteredTask);
+    const updatedTasks = getItems.filter((_, i) => i !== index);
+    setTaskArr(updatedTasks);
   }
-
   return (
     <div>
       <ToastContainer
@@ -109,13 +128,27 @@ export default function Home() {
             <h2 className="text-[1.5rem] md:text-[1.7rem]">Your tasks</h2>
           </div>
           {getItems?.map((item, index) => (
-            <>
-              <div className="flex items-center justify-between" key={item}>
+            <div className="flex items-center justify-between" key={item}>
+              {editIndex === index ? ( // Render input field if currently editing this task
+                <input
+                  type="text"
+                  value={tasks}
+                  onChange={handleTasksOnChange}
+                  className="bg-transparent border-none outline-none px-1 py-3 text"
+                />
+              ) : (
                 <p className="text-lg md:text-xl px-1 py-3 break-all">&#10132; {item}</p>
-                <button onClick={() => handleDeletetasks(item)} ><DeleteIcon /></button>
+              )}
+
+              <div className="flex gap-3 items-center">
+                {editIndex === index ? ( // Render SaveIcon if currently editing this task
+                  <button onClick={handleSubmit}><SendIcon /></button>
+                ) : (
+                  <EditIcon onClick={() => handleEditTask(index)} className="w-6 fill-yellow-500 cursor-pointer" />
+                )}
+                <button onClick={() => handleDeleteTask(index)}><DeleteIcon /></button>
               </div>
-              <hr key={index} />
-            </>
+            </div>
           ))}
         </div>
         <form action="/" onSubmit={handleSubmit}>
